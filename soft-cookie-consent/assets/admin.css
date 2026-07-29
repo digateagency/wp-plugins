@@ -1,0 +1,22 @@
+.ecc-admin .ecc-lang-tabs {
+  margin: 16px 0 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.ecc-admin .ecc-lang-panel[hidden] {
+  display: none !important;
+}
+
+.ecc-admin .form-table th {
+  width: 240px;
+}
+
+.ecc-admin .ul-disc {
+  list-style: disc;
+  margin-left: 1.2em;
+}
+
+.ecc-admin .wp-picker-container {
+  vertical-align: middle;
+}

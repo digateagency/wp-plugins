@@ -6,7 +6,7 @@
 
 ## Скачать
 
-[Скачать последнюю версию](https://github.com/digateagency/wp-plugins/releases/download/soft-cookie-consent-v1.0.9/soft-cookie-consent-v1.0.9.zip)
+[Скачать последнюю версию](https://github.com/digateagency/wp-plugins/releases/download/v1.1.2/soft-cookie-consent-v1.1.2.zip)
 
 
 ## Что умеет

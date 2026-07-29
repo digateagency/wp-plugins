@@ -112,12 +112,38 @@
     state.showRevision = false;
     pushConsentMode(payload.categories);
     unlockScripts(payload.categories);
+    logConsent(payload);
     document.dispatchEvent(
       new CustomEvent('ecc:consent', {
         detail: payload,
       })
     );
     return payload;
+  }
+
+  function logConsent(payload) {
+    if (!cfg.logConsent || !cfg.ajaxUrl) return;
+    var params = new URLSearchParams();
+    params.append('action', 'ecc_log_consent');
+    params.append('nonce', cfg.logNonce || '');
+    params.append('consent', JSON.stringify(payload));
+    params.append('page_url', location.href);
+    var body = params.toString();
+    try {
+      if (navigator.sendBeacon) {
+        var blob = new Blob([body], { type: 'application/x-www-form-urlencoded; charset=UTF-8' });
+        if (navigator.sendBeacon(cfg.ajaxUrl, blob)) return;
+      }
+    } catch (e) {}
+    if (window.fetch) {
+      fetch(cfg.ajaxUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: body,
+        credentials: 'same-origin',
+        keepalive: true,
+      }).catch(function () {});
+    }
   }
 
   function pushConsentMode(cats) {

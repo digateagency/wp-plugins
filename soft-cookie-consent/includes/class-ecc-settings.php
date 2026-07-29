@@ -66,7 +66,10 @@ class ECC_Settings {
 		$out['show_settings']    = ! empty( $input['show_settings'] ) ? 1 : 0;
 		$out['show_reopen']      = ! empty( $input['show_reopen'] ) ? 1 : 0;
 		$out['block_scripts']    = ! empty( $input['block_scripts'] ) ? 1 : 0;
+		$out['auto_block_known'] = ! empty( $input['auto_block_known'] ) ? 1 : 0;
 		$out['gtm_consent_mode'] = ! empty( $input['gtm_consent_mode'] ) ? 1 : 0;
+		$out['log_consent']      = ! empty( $input['log_consent'] ) ? 1 : 0;
+		$out['log_retention_days'] = max( 0, min( 3650, absint( $input['log_retention_days'] ?? 365 ) ) );
 
 		$lang = sanitize_key( $input['language'] ?? 'ru' );
 		$out['language'] = isset( ECC_Helpers::languages()[ $lang ] ) ? $lang : 'ru';
@@ -140,6 +143,7 @@ class ECC_Settings {
 			'texts'    => __( 'Тексты RU / EN', 'soft-cookie-consent' ),
 			'styles'   => __( 'Стили', 'soft-cookie-consent' ),
 			'advanced' => __( 'Скрипты', 'soft-cookie-consent' ),
+			'log'      => __( 'Журнал', 'soft-cookie-consent' ),
 		);
 		if ( ! isset( $tabs[ $tab ] ) ) {
 			$tab = 'general';
@@ -158,6 +162,9 @@ class ECC_Settings {
 				<?php endforeach; ?>
 			</nav>
 
+			<?php if ( $tab === 'log' ) : ?>
+				<?php ECC_Log::render_admin_tab( $s ); ?>
+			<?php else : ?>
 			<form method="post" action="options.php" class="ecc-form">
 				<?php settings_fields( 'ecc_settings_group' ); ?>
 
@@ -413,7 +420,14 @@ class ECC_Settings {
 								<label><input type="checkbox" name="<?php echo esc_attr( ECC_Helpers::OPTION ); ?>[block_scripts]" value="1" <?php checked( $s['block_scripts'] ); ?>>
 									<?php esc_html_e( 'Не запускать необязательные скрипты до согласия', 'soft-cookie-consent' ); ?></label>
 								<p class="description">
-									<?php esc_html_e( 'Помечайте скрипты атрибутом type="text/plain" data-ecc-category="analytics|marketing|preferences" или фильтруйте через ecc_script_category.', 'soft-cookie-consent' ); ?>
+									<?php esc_html_e( 'Включает механизм отложенного запуска. Скрипты с type="text/plain" data-ecc-category="…" или через фильтр ecc_script_category стартуют только после согласия.', 'soft-cookie-consent' ); ?>
+								</p>
+								<label style="display:block;margin-top:10px;">
+									<input type="checkbox" name="<?php echo esc_attr( ECC_Helpers::OPTION ); ?>[auto_block_known]" value="1" <?php checked( ! empty( $s['auto_block_known'] ) ); ?> <?php disabled( empty( $s['block_scripts'] ) ); ?>>
+									<?php esc_html_e( 'Автоматически блокировать известные счётчики', 'soft-cookie-consent' ); ?>
+								</label>
+								<p class="description">
+									<?php esc_html_e( 'Метрика, GA/GTM, Facebook Pixel и др. — в том числе из HTML темы. Для этого страница кратко обрабатывается перед отдачей (обычно незаметно; на очень тяжёлых страницах можно выключить и помечать скрипты вручную). При включённом Consent Mode GTM/gtag не блокируются.', 'soft-cookie-consent' ); ?>
 								</p>
 							</td>
 						</tr>
@@ -444,8 +458,17 @@ class ECC_Settings {
 				submit_button( __( 'Сохранить', 'soft-cookie-consent' ) );
 				?>
 			</form>
+			<?php endif; ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * @param string              $tab
+	 * @param array<string,mixed> $s
+	 */
+	public static function preserve_other_tabs_public( $tab, $s ) {
+		self::preserve_other_tabs( $tab, $s );
 	}
 
 	/**
@@ -458,7 +481,8 @@ class ECC_Settings {
 			'general'  => array( 'enabled', 'language', 'layout', 'corner_side', 'enter_delay', 'show_reject', 'show_settings', 'show_reopen', 'categories_enabled', 'privacy_page', 'privacy_page_en', 'privacy_url', 'privacy_url_en', 'cookie_days', 'consent_version' ),
 			'texts'    => array( 'texts' ),
 			'styles'   => array( 'styles' ),
-			'advanced' => array( 'block_scripts', 'gtm_consent_mode' ),
+			'advanced' => array( 'block_scripts', 'auto_block_known', 'gtm_consent_mode' ),
+			'log'      => array( 'log_consent', 'log_retention_days' ),
 		);
 		$visible = $map[ $tab ] ?? array();
 

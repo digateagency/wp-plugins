@@ -15,6 +15,16 @@
     $layout.on('change', syncCornerRow);
     syncCornerRow();
 
+    var $block = $('input[name="ecc_settings[block_scripts]"]');
+    var $auto = $('input[name="ecc_settings[auto_block_known]"]');
+    function syncAutoBlock() {
+      if (!$block.length || !$auto.length) return;
+      var on = $block.is(':checked');
+      $auto.prop('disabled', !on);
+    }
+    $block.on('change', syncAutoBlock);
+    syncAutoBlock();
+
     var $tabs = $('[data-ecc-lang-tabs]');
     if (!$tabs.length) return;
 

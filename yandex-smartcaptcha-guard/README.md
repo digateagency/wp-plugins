@@ -6,7 +6,7 @@ Yandex SmartCaptcha Guard — легковесный WordPress-плагин дл
 
 ## Скачать
 
-[Скачать последнюю версию](https://github.com/digateagency/WP-plugins/releases/latest/download/yandex-smartcaptcha-guard.zip)
+[Скачать последнюю версию](https://github.com/digateagency/wp-plugins/releases/download/v3.8/yandex-smartcaptcha-guard.zip)
 
 ## Возможности
 
